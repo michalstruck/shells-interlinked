@@ -1,0 +1,45 @@
+{
+  "Name": "shells-interlinked",
+  "Version": "0.1.0.0",
+  "Author": "michalstruck",
+  "Actions": [
+    {
+      "Name": "Counter",
+      "UUID": "com.michalstruck.shells-interlinked.shell-switch",
+      "Icon": "assets/empty",
+      "Tooltip": "Cycles through shell states on press.",
+      "PropertyInspectorPath": "ui/shell-switch.html",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "assets/empty",
+          "TitleAlignment": "middle"
+        }
+      ]
+    }
+  ],
+  "Category": "shells-interlinked",
+  "CategoryIcon": "imgs/plugin/category-icon",
+  "CodePath": "bin/plugin.js",
+  "Description": "a pun on bladerunner. also a game helper thing",
+  "Icon": "imgs/plugin/marketplace",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.4"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "10.15"
+    },
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Nodejs": {
+    "Version": "20",
+    "Debug": "enabled"
+  },
+  "UUID": "com.michalstruck.shells-interlinked"
+}
