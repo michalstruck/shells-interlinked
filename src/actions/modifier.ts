@@ -1,5 +1,6 @@
 import streamDeck, {
   action,
+  DidReceiveSettingsEvent,
   KeyDownEvent,
   SingletonAction,
   Target,
@@ -7,6 +8,7 @@ import streamDeck, {
 } from "@elgato/streamdeck";
 import { type GlobalSettings } from "../types.global";
 import { ModifierModeIconMap } from "../icons";
+import { isShootModeDefault } from "../globals";
 
 const getModifierIcon = (isShootMode: boolean) => {
   if (isShootMode) {
@@ -14,8 +16,6 @@ const getModifierIcon = (isShootMode: boolean) => {
   }
   return ModifierModeIconMap["shootMode"];
 };
-
-const isShootModeDefault = false;
 
 @action({ UUID: "com.michalstruck.shells-interlinked.modifier" })
 export class ModifierButton extends SingletonAction {

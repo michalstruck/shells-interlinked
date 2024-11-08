@@ -22,13 +22,13 @@
     {
       "Name": "Modifier",
       "UUID": "com.michalstruck.shells-interlinked.modifier",
-      "Icon": "imgs/change-mode",
+      "Icon": "imgs/shoot-mode",
       "Tooltip": "Modifier on press.",
       "PropertyInspectorPath": "ui/modifier.html",
       "Controllers": ["Keypad"],
       "States": [
         {
-          "Image": "imgs/change-mode",
+          "Image": "imgs/shoot-mode",
           "TitleAlignment": "middle"
         }
       ]

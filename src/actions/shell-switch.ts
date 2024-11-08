@@ -2,7 +2,6 @@ import streamDeck, {
   action,
   KeyDownEvent,
   SingletonAction,
-  Target,
   WillAppearEvent,
 } from "@elgato/streamdeck";
 import { NonEmptyRound, Round, RoundIconMap } from "../icons";
@@ -22,7 +21,7 @@ const resolveNextIcon = (
       return "empty";
     }
 
-    return lastNonEmptyRound ?? defaultRound;
+    return lastNonEmptyRound ?? "live";
   }
 
   if (currentRound === "live") {
