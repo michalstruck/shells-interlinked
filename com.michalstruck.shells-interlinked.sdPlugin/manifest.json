@@ -2,27 +2,41 @@
   "Name": "shells-interlinked",
   "Version": "0.1.0.0",
   "Author": "michalstruck",
+  "Icon": "imgs/empty",
+  "CategoryIcon": "imgs/empty",
   "Actions": [
     {
-      "Name": "Counter",
+      "Name": "Shell Switch",
       "UUID": "com.michalstruck.shells-interlinked.shell-switch",
-      "Icon": "assets/empty",
+      "Icon": "imgs/empty",
       "Tooltip": "Cycles through shell states on press.",
       "PropertyInspectorPath": "ui/shell-switch.html",
       "Controllers": ["Keypad"],
       "States": [
         {
-          "Image": "assets/empty",
+          "Image": "imgs/empty",
+          "TitleAlignment": "middle"
+        }
+      ]
+    },
+    {
+      "Name": "Modifier",
+      "UUID": "com.michalstruck.shells-interlinked.modifier",
+      "Icon": "imgs/change-mode",
+      "Tooltip": "Modifier on press.",
+      "PropertyInspectorPath": "ui/modifier.html",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "imgs/change-mode",
           "TitleAlignment": "middle"
         }
       ]
     }
   ],
   "Category": "shells-interlinked",
-  "CategoryIcon": "imgs/plugin/category-icon",
   "CodePath": "bin/plugin.js",
   "Description": "a pun on bladerunner. also a game helper thing",
-  "Icon": "imgs/plugin/marketplace",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "6.4"

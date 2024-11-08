@@ -1,61 +1,105 @@
-import {
+import streamDeck, {
   action,
   KeyDownEvent,
   SingletonAction,
+  Target,
   WillAppearEvent,
 } from "@elgato/streamdeck";
-import { blank, empty, live } from "../icons";
+import { NonEmptyRound, Round, RoundIconMap } from "../icons";
+import { GlobalSettings } from "../types.global";
 
-const ValueIconMap = {
-  live,
-  blank,
-  empty,
-} as const;
+const defaultRound = "empty" as const;
 
-type ValueIcon = keyof typeof ValueIconMap;
+const getIcon = (icon: Round) => RoundIconMap[icon];
 
-const defaultIcon = "empty" as const;
+const resolveNextIcon = (
+  currentRound: Round,
+  isShootMode: boolean,
+  lastNonEmptyRound: "live" | "blank" | undefined
+): Round => {
+  if (isShootMode) {
+    if (currentRound === "live" || currentRound === "blank") {
+      return "empty";
+    }
 
-const getIcon = (icon: ValueIcon) => ValueIconMap[icon];
-
-const resolveNextIcon = (currentIcon: ValueIcon) => {
-  if (currentIcon === "empty") {
-    return "live";
+    return lastNonEmptyRound ?? defaultRound;
   }
-  if (currentIcon === "live") {
+
+  if (currentRound === "live") {
     return "blank";
   }
-  return "empty";
+
+  return "live";
 };
 
+// new action button
+// when active switch live/blank to empty
+// when active switch empty to last known live/blank
+// when not active, cycle through live/blank
 @action({ UUID: "com.michalstruck.shells-interlinked.shell-switch" })
-export class ShellSwitch extends SingletonAction<ShellSwitchSettings> {
-  override onWillAppear(
-    ev: WillAppearEvent<ShellSwitchSettings>
-  ): void | Promise<void> {
-    const icon = getIcon(ev.payload.settings.currentIcon ?? defaultIcon);
+export class ShellSwitch extends SingletonAction<{}> {
+  override async onWillAppear(ev: WillAppearEvent<{}>): Promise<void> {
+    await streamDeck.settings.setGlobalSettings({});
+
+    const icon = getIcon(defaultRound);
     return ev.action.setImage(icon);
   }
 
-  override async onKeyDown(
-    ev: KeyDownEvent<ShellSwitchSettings>
-  ): Promise<void> {
-    const { settings } = ev.payload;
+  override async onKeyDown(ev: KeyDownEvent<{}>): Promise<void> {
+    if (
+      ev.action.coordinates?.column === undefined ||
+      ev.action.coordinates?.row === undefined
+    ) {
+      streamDeck.logger.info({
+        origin: "modifier",
+        ...ev.action,
+      });
+      return;
+    }
 
-    const currentIcon = settings.currentIcon ?? defaultIcon;
-    settings.currentIcon = resolveNextIcon(currentIcon);
+    const roundSettingsKey =
+      `col-${ev.action.coordinates.column}-row-${ev.action.coordinates.row}` as const;
+    const globalSettings =
+      await streamDeck.settings.getGlobalSettings<GlobalSettings>();
 
-    await ev.action.setSettings(settings);
+    const isShootMode = Boolean(globalSettings.isShootMode);
+    let round =
+      globalSettings.rounds?.[roundSettingsKey] ??
+      ({} as { state: Round; lastNonEmptyRound: NonEmptyRound | undefined });
 
-    const icon = getIcon(settings.currentIcon);
+    const lastNonEmptyRound = round.lastNonEmptyRound;
 
-    await ev.action.setImage(icon);
+    const currentRound = round.state ?? defaultRound;
+
+    streamDeck.logger.debug({
+      round,
+    });
+
+    let newGlobalSettings = {
+      rounds: {
+        ...globalSettings.rounds,
+        [roundSettingsKey]: {
+          state: resolveNextIcon(currentRound, isShootMode, lastNonEmptyRound),
+          lastNonEmptyRound:
+            currentRound === "empty" ? lastNonEmptyRound : currentRound,
+        },
+      },
+      isShootMode,
+    } as GlobalSettings;
+
+    const icon = getIcon(newGlobalSettings.rounds[roundSettingsKey]!.state);
+
+    await ev.action.setImage(icon, {});
+
+    await streamDeck.settings.setGlobalSettings<GlobalSettings>(
+      newGlobalSettings
+    );
+
+    streamDeck.logger.info({
+      origin: "shell-switch",
+      roundSettingsKey,
+      globalSettings,
+      newGlobalSettings,
+    });
   }
 }
-
-/**
- * Settings for {@link ShellSwitch}.
- */
-type ShellSwitchSettings = {
-  currentIcon?: ValueIcon;
-};
